@@ -1,0 +1,77 @@
+[gd_scene load_steps=3 format=2]
+
+[sub_resource type="Gradient" id=1]
+offsets = PoolRealArray( 4.2039e-45, 1.38729e-43 )
+colors = PoolColorArray( 1, 0.0509804, 0.0509804, 1, 0.968627, 1, 0.0392157, 1 )
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends Line2D
+
+var players:Array = []
+var v2_array:PoolVector2Array
+var color_array:PoolColorArray
+
+func _ready():
+	# atribuo objetos do grupo em questão a nodes
+	players = _get_all_nodes_from_group(\"player\")
+	var i:int = 0
+	for player in players:
+		v2_array.append(player.position)
+		color_array.append(player.color)
+		gradient.set_color(i, player.color)
+		i+=1
+	set_points(v2_array)
+
+func _process(delta):
+	var i:int = 0 
+	var xy_array:PoolVector2Array = []
+	for point in points:
+		points[i] = players[i].position
+		xy_array.insert(i, points[i])
+		i += 1
+
+func _on_change_point_color(id:int, color:Color) -> void:
+	color_array[id-1] = color
+	for c in color_array:
+		gradient.colors[id-1] = color
+
+func _get_all_nodes_from_group(group) -> Array:
+	\"\"\"
+	função para retornar um 
+	array com objetos que estão
+	em um determinado grupo
+	\"\"\"
+	var obj_in_group:Array = []
+	for child in get_parent().get_children():
+		if child.is_in_group(group):
+			obj_in_group.append(child)
+	return obj_in_group
+	
+#func _get_x(array:PoolVector2Array) -> Array:
+#	var xpos:Array = []
+#	var i:int = 0
+#	for items in array:
+#		xpos.insert(i, array[i].x)
+#		i+=1
+#	xpos.invert()
+#	xpos.remove(player_variables.player_index - 2)
+#	return xpos
+#
+#func _get_y(array:PoolVector2Array) -> Array:
+#	var ypos:Array = []
+#	var i:int = 0
+#	for items in array:
+#		ypos.insert(i, array[i].y)
+#		i+=1
+#	ypos.invert()
+#	ypos.remove(player_variables.player_index - 2)
+#	return ypos
+	"
+
+[node name="Line2D" type="Line2D"]
+points = PoolVector2Array( 207.134, 99.2702, 61.7222, 118.371, 0, 0 )
+width = 3.0
+default_color = Color( 1, 1, 1, 1 )
+gradient = SubResource( 1 )
+texture_mode = 0
+script = SubResource( 2 )
